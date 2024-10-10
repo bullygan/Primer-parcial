@@ -82,15 +82,13 @@ sudo tc qdisc add dev int2 root tbf rate 150Mbit burst 10kb limit 20kb
 
 for ((i = 1; i <= cli; i++)); do
     pu=$((49999+$i))
-    #sudo rm ns_c$i
+    sudo rm ns_c$i
     sudo ip netns exec ns_server iperf3 -s -p $pu -1 --logfile ns_c$i & # Ejecuta los servidores iperf3 en distintos puertos para luego poder enviar el trafico desde cada ns cliente.
-    sleep 1
     ip=$((100+$i))
     sudo ip netns add ns_c$i # Crea los namespaces ns_c(i) que enviaran tráfico al servidor de iperf3.
     printf "\n"
     echo "namespace ns_c$i ha sido creado"
     printf "\n"
-    sleep 1
     sudo ip link add int_c$i type veth peer name intISP$i # Este comando genera c/u de los enlaces virtuales entre el ns cliente y el ISP.
     sudo ip link set dev int_c$i netns ns_c$i # Se conecta cada interfaz int_ci a su correspondiente namespace i.
     sudo ovs-vsctl add-port ISP intISP$i # Lo mismo que la linea de arriba nada mas que del lado del ISP se agrega cada ints(i).
@@ -101,9 +99,6 @@ for ((i = 1; i <= cli; i++)); do
     sudo ip link set dev intISP$i up
     sudo ip netns exec ns_c$i ip link set dev int_c$i up
     #Esta linea que sigue se encarga de enviar el trafico iperf3 desde cada ns a cada servidor a si puerto correspondiente y el output los transforma a JSON y lo manda a un archivo .json.
-    sudo ip netns exec ns_c$i iperf3 -c 10.0.0.100 -p $pu -R # > iperf3_cl$i.json &
-    echo "---------------------------------------------------------------------"
-done
     sudo ip netns exec ns_c$i iperf3 -c 10.0.0.100 -p $pu -t $time -R & # > iperf3_cl$i.json &
     echo "---------------------------------------------------------------------"
 done
@@ -113,7 +108,6 @@ sudo ip link show | grep int
 # sudo ip link delete int2 type veth peer name int1
 sudo ip link delete intss
 sudo ip link delete int2
-
 for ((i = 1; i <= cli; i++)); do
 sudo ip link delete intISP$i
 done
