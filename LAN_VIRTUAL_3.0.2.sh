@@ -28,13 +28,10 @@ printf "\n"
 echo "Defina cantidad de clientes:"
 read cli
 printf "\n"
-<<<<<<< HEAD
-=======
 #Definir tiempo a realizar la emulación
 echo "Defina tiempo de emulación en seg:"
 read time
 printf "\n"
->>>>>>> e54ba8ff2cbbe6aab0155dd8819586f7e817c813
 #Creo bridge
 echo " ---------------------------- "
 echo "| CREANDO UN BRIDGE CON OVS  |"
@@ -104,17 +101,13 @@ for ((i = 1; i <= cli; i++)); do
     sudo ip link set dev intISP$i up
     sudo ip netns exec ns_c$i ip link set dev int_c$i up
     #Esta linea que sigue se encarga de enviar el trafico iperf3 desde cada ns a cada servidor a si puerto correspondiente y el output los transforma a JSON y lo manda a un archivo .json.
-<<<<<<< HEAD
     sudo ip netns exec ns_c$i iperf3 -c 10.0.0.100 -p $pu -R # > iperf3_cl$i.json &
     echo "---------------------------------------------------------------------"
 done
-
-=======
     sudo ip netns exec ns_c$i iperf3 -c 10.0.0.100 -p $pu -t $time -R & # > iperf3_cl$i.json &
     echo "---------------------------------------------------------------------"
 done
 sleep $time
->>>>>>> e54ba8ff2cbbe6aab0155dd8819586f7e817c813
 echo "Limpieza de interfaces"
 sudo ip link show | grep int
 # sudo ip link delete int2 type veth peer name int1
